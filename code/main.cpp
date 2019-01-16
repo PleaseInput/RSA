@@ -4,6 +4,7 @@
 
 int main()
 {
+	
 	BigNum a, b;
 	BigNum ans_bn, tmp;
 
@@ -14,20 +15,18 @@ int main()
 
 	char c;
 	string t;
-
-	t = 50;
-	cout << t;
+	
 
 	//for(int i=0;i<255;i++)
 	//	cout << i << " th is \"" << char(i) << "\"\n";
 
 	/*
 	cin >> a >> b;
-	ans_bn = a + b;
+	ans_bn = a * b;
 	cout << ans_bn << "\n";
 	*/
 
-	/*
+	
 	for(int i=0; i < 200000; i++)
 	{
 		cout << "the " << i << " times\n";
@@ -38,18 +37,18 @@ int main()
 		a.set_val(to_string(x));
 		b.set_val(to_string(y));
 
-		ans_i = x + y;		
-		ans_bn = a + b;
+		ans_i = x * y;		
+		ans_bn = a * b;
 		
 		tmp.set_val(to_string(ans_i));
 		if (!(tmp == ans_bn))
 		{
-			cout << x << " + " << y << " = " << ans_i << "\n";
-			cout << a << " + " << b << " = " << ans_bn << "\n";
+			cout << x << " * " << y << " = " << ans_i << "\n";
+			cout << a << " * " << b << " = " << ans_bn << "\n";
 			getchar();
 		}
 	}
-	*/
+	
 
 	/*
 	for (int i = 0; i < 10; i++)

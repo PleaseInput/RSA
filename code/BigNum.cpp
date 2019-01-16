@@ -204,6 +204,17 @@ BigNum operator-(BigNum &bn_1, BigNum &bn_2)
 BigNum operator*(BigNum &bn_1, BigNum &bn_2)
 {
 	BigNum ans("");
+
+	BigNum zero;
+	if (bn_1 == zero || bn_2 == zero)
+		return zero;
+
+	/*
+		99...9 * 99...9 = (10^i - 1) * (10^k - 1) = 10^(i+k) - 10^i - 10^k + 1
+		<  i  >  <  k  >
+		ans.len = bn_1.len + bn_2.len. enough.
+					i			k
+	*/
 	for (int i = 0; i < bn_1.len + bn_2.len; i++)
 	{
 		ans.val.insert(ans.val.begin(), '0');
@@ -219,12 +230,20 @@ BigNum operator*(BigNum &bn_1, BigNum &bn_2)
 	{
 		for (int j = 0; j < bn_1.len; j++)
 		{
-			sum = (bn_2.val[i] - '0') * (bn_1.val[j] - '0') + carry;
+			sum = (bn_2.val[i] - '0') * (bn_1.val[j] - '0') + carry + (ans.val[i + j] - '0');
 			carry = sum / BASE;
 			sum = sum % BASE;
-			ans.val[i + j] = sum;
+			ans.val[i + j] = sum + '0';
 		}
+		if (carry)
+			ans.val[i + bn_1.len] += carry;
+		carry = 0;
 	}
+	ans.len = (int)ans.val.length();
+	ans.era_zero(false);
+
+	if (bn_1.is_neg ^ bn_2.is_neg)
+		ans.is_neg = true;
 
 	return ans;
 }
