@@ -59,11 +59,12 @@ class BigNum {
 		BigNum set_val(string value);
 		// ----- end "set_val" -----
 
-		// ----- begin "=, +, -" -----
+		// ----- begin "=, +, -, *" -----
 		BigNum& operator=(const BigNum &bn);
 		friend BigNum operator+(BigNum &bn_1, BigNum &bn_2);
 		friend BigNum operator-(BigNum &bn_1, BigNum &bn_2);
-		// ----- end "=, +" -----
+		friend BigNum operator*(BigNum &bn_1, BigNum &bn_2);
+		// ----- end "=, +, -, *" -----
 
 		// ----- begin "==, >, <" -----
 		friend bool operator==(const BigNum &bn_1, const BigNum &bn_2);
@@ -76,5 +77,5 @@ class BigNum {
 		
 		// erase zero. e.g. "008"=>"8". rev:if it need to be reversed.
 		BigNum era_zero(bool rev);
-		// ----- end "negate" -----
+		// ----- end "negate, era_zero" -----
 };

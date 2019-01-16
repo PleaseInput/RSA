@@ -66,11 +66,13 @@ BigNum BigNum::set_val(string value)
 	if (len == 1 && val[0] == '0')
 		is_neg = false;
 
+	this->era_zero(false);
+
 	return *this;
 }
 // ----- end "set_val" -----
 
-// ----- begin "=, +, -" -----
+// ----- begin "=, +, -, *" -----
 BigNum& BigNum::operator=(const BigNum &bn)
 {
 	is_neg = bn.is_neg;
@@ -91,7 +93,7 @@ BigNum operator+(BigNum &bn_1, BigNum &bn_2)
 		if (!bn_lf.is_neg && bn_rt.is_neg)
 		{
 			bn_rt.negate();	// (-b)=>-(+b)
-			return bn_lf - bn_rt;
+			return (bn_lf - bn_rt).era_zero(false);
 		}
 		// bn_lf:-	bn_rt:-
 		if (bn_lf.is_neg && bn_rt.is_neg)
@@ -146,13 +148,24 @@ BigNum operator-(BigNum &bn_1, BigNum &bn_2)
 		BigNum ans;
 		return ans;
 	}
-
-	// ----- begin bn_1:+/bn_2:+    bn_1:-/bn_2:- -----
+	
 	bool tmp_bool = (bn_1 > bn_2);
 	BigNum bn_lf = tmp_bool ? bn_1 : bn_2;
 	BigNum bn_rt = tmp_bool ? bn_2 : bn_1;
 	BigNum ans("");
 
+	// ----- begin bn_1:+/bn_2:-   bn_1:-/bn_2:+ -----
+	if (bn_lf.is_neg ^ bn_rt.is_neg)
+	{
+		bn_rt.negate();
+		ans = bn_lf + bn_rt;
+		if (!tmp_bool)
+			ans.negate();
+		return ans;
+	}
+	// ----- end bn_1:+/bn_2:-   bn_1:-/bn_2:+ -----
+
+	// ----- begin bn_1:+/bn_2:+    bn_1:-/bn_2:- -----
 	int borrow = 0, sum = 0;
 	int diff = bn_lf.len - bn_rt.len;
 	// e.g. real val : 246 - 13 => 246 - 013 
@@ -164,17 +177,17 @@ BigNum operator-(BigNum &bn_1, BigNum &bn_2)
 	for (int i = 0; i < bn_lf.len; i++)
 	{
 		// x[i] - y[i]
-		int x = bn_lf.val[i] - '0';
+		int x = bn_lf.val[i] - '0' - borrow;
 		int y = bn_rt.val[i] - '0';
 		
 		if (x >= y)
 		{
-			sum = x - y - borrow;
+			sum = x - y;
 			borrow = 0;
 		}
 		else
 		{
-			sum = x + BASE - y - borrow;
+			sum = x + BASE - y;
 			borrow = 1;
 		}
 		ans.val.insert(0, to_string(sum));
@@ -187,7 +200,35 @@ BigNum operator-(BigNum &bn_1, BigNum &bn_2)
 
 	return ans;
 }
-// ----- end "=, +, -" -----
+
+BigNum operator*(BigNum &bn_1, BigNum &bn_2)
+{
+	BigNum ans("");
+	for (int i = 0; i < bn_1.len + bn_2.len; i++)
+	{
+		ans.val.insert(ans.val.begin(), '0');
+	}
+	
+	/*
+		  bn_1
+		* bn_2
+	*/
+	int carry = 0;
+	int sum = 0;
+	for (int i = 0; i < bn_2.len; i++)
+	{
+		for (int j = 0; j < bn_1.len; j++)
+		{
+			sum = (bn_2.val[i] - '0') * (bn_1.val[j] - '0') + carry;
+			carry = sum / BASE;
+			sum = sum % BASE;
+			ans.val[i + j] = sum;
+		}
+	}
+
+	return ans;
+}
+// ----- end "=, +, -, *" -----
 
 // ----- begin "==, >, <" -----
 bool operator==(const BigNum &bn_1, const BigNum &bn_2)
@@ -264,7 +305,7 @@ BigNum BigNum::negate()
 }
 
 // all numbers are regarded as reversed numbers. e.g. real value "53". reversed "35"
-BigNum BigNum::era_zero(bool rev)
+BigNum BigNum::era_zero(bool rev = false)
 {
 	if (rev)	
 		reverse(val.begin(), val.end());
@@ -274,6 +315,8 @@ BigNum BigNum::era_zero(bool rev)
 	{
 		if (val[i] == '0')
 			val.erase(i);
+		else
+			break;
 	}
 
 	//if (rev)
