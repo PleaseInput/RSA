@@ -249,6 +249,93 @@ BigNum operator*(BigNum &bn_1, BigNum &bn_2)
 }
 // ----- end "=, +, -, *" -----
 
+// ----- begin "sf_lf, sf_rt" -----
+BigNum operator/(BigNum &bn_1, BigNum &bn_2)
+{
+	BigNum ans;
+	if (bn_1 < bn_2)
+	{
+		ans.set_val("0");
+		return ans;
+	}
+
+	if (bn_1 == bn_2)
+	{
+		ans.set_val("1");
+		return ans;
+	}
+
+	// ----- begin bn_1 > bn_2 -----
+	BigNum bn_lf = bn_1;
+	BigNum bn_rt = bn_2;
+	int sf_len = bn_lf.len - bn_rt.len;
+
+	for (int i = sf_len; i >= 0; i--)
+	{
+
+	}
+	// ----- end bn_1 > bn_2 -----
+}
+
+BigNum BigNum::sf_lf(int sf_len)
+{
+	BigNum ans = *this;
+
+	for (int i = 0; i < sf_len; i++)
+	{
+		ans.val.insert(ans.val.begin(), '0');
+	}
+	ans.len = (int)ans.val.length();
+	return ans;
+}
+
+BigNum BigNum::sf_rt(int sf_len)
+{
+	BigNum ans = *this;
+
+	for (int i = 0; i < sf_len; i++)
+	{
+		if (ans.val[0] == '0')
+			ans.val.erase(ans.val.begin());
+		else
+		{
+			cout << "in " << i << "'s iteration. val[0] = " << ans.val[0] << "\n";
+			break;
+		}
+	}
+	ans.len = (int)ans.val.length();
+	return *this;
+}
+
+BigNum BigNum::mul_int(int tmp_int)
+{
+	BigNum ans = *this;
+
+	// tmp_int == 0
+	if (tmp_int == 0)
+	{
+		ans.set_val(to_string(0));
+		return ans;
+	}
+
+	// tmp_int != 0
+	int carry = 0, sum = 0;
+	for (int i = 0; i < ans.len; i++)
+	{
+		sum = (ans.val[i] - '0') * tmp_int + carry;
+		carry = sum / BASE;
+		sum = sum % BASE;
+		ans.val[i] = sum + '0';
+	}
+	if (carry)
+	{
+		ans.val.insert(ans.val.end(), '0' + carry);
+	}
+	ans.len = (int)ans.val.length();
+	return ans;
+}
+// ----- end "sf_lf, sf_rt" -----
+
 // ----- begin "==, >, <" -----
 bool operator==(const BigNum &bn_1, const BigNum &bn_2)
 {

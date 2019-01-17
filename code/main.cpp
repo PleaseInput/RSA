@@ -5,10 +5,10 @@
 int main()
 {
 	
-	BigNum a, b;
+	BigNum a("45"), b;
 	BigNum ans_bn, tmp;
 
-	int x, y;
+	int x = 45, y;
 	int ans_i;
 
 	srand(time(NULL));
@@ -16,6 +16,15 @@ int main()
 	char c;
 	string t;
 	
+	for (int i = 0; i < 10; i++)
+	{
+		ans_bn = a.mul_int(i);
+		tmp.set_val(to_string(x * i));
+		if (ans_bn == tmp)
+			cout << i << " ok\n";
+		else
+			cout << i << "\n";
+	}
 
 	//for(int i=0;i<255;i++)
 	//	cout << i << " th is \"" << char(i) << "\"\n";
@@ -26,7 +35,7 @@ int main()
 	cout << ans_bn << "\n";
 	*/
 
-	
+	/*
 	for(int i=0; i < 200000; i++)
 	{
 		cout << "the " << i << " times\n";
@@ -48,7 +57,7 @@ int main()
 			getchar();
 		}
 	}
-	
+	*/
 
 	/*
 	for (int i = 0; i < 10; i++)

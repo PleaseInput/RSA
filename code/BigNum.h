@@ -66,6 +66,22 @@ class BigNum {
 		friend BigNum operator*(BigNum &bn_1, BigNum &bn_2);
 		// ----- end "=, +, -, *" -----
 
+		// ----- begin "sf_lf, sf_rt, mul_int" -----
+		friend BigNum operator/(BigNum &bn_1, BigNum &bn_2);
+		
+		/*
+			sf_lf and sf_rt are used for division function.
+			e.g. real val 45. shift left 2 digits. 4500.
+		*/
+		BigNum sf_lf(int sf_len);
+		BigNum sf_rt(int sf_len);
+
+		/*
+			mul_int : cimpute bn * x. 1 < x < 10. x is an int.
+		*/
+		BigNum mul_int(int tmp_int);
+		// ----- end "sf_lf, sf_rt" -----
+
 		// ----- begin "==, >, <" -----
 		friend bool operator==(const BigNum &bn_1, const BigNum &bn_2);
 		friend bool operator>(const BigNum &bn_1, const BigNum &bn_2);
