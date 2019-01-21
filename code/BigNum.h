@@ -82,11 +82,13 @@ class BigNum {
 		BigNum mul_int(int tmp_int);
 		// ----- end "sf_lf, sf_rt" -----
 
-		// ----- begin "==, >, <" -----
+		// ----- begin "==, >, <, >=, <=" -----
 		friend bool operator==(const BigNum &bn_1, const BigNum &bn_2);
 		friend bool operator>(const BigNum &bn_1, const BigNum &bn_2);
 		friend bool operator<(const BigNum &bn_1, const BigNum &bn_2);
-		// ----- end "==, >, <" -----
+		friend bool operator>=(const BigNum &bn_1, const BigNum &bn_2);
+		friend bool operator<=(const BigNum &bn_1, const BigNum &bn_2);
+		// ----- end "==, >, <, >=, <=" -----
 
 		// ----- begin "negate, era_zero" -----
 		BigNum negate();

@@ -192,6 +192,7 @@ BigNum operator-(BigNum &bn_1, BigNum &bn_2)
 		}
 		ans.val.insert(0, to_string(sum));
 	}
+	ans.len = (int)ans.val.length();
 	ans.era_zero(true);
 	
 	if (!tmp_bool)
@@ -253,6 +254,20 @@ BigNum operator*(BigNum &bn_1, BigNum &bn_2)
 BigNum operator/(BigNum &bn_1, BigNum &bn_2)
 {
 	BigNum ans;
+	
+	// ----- begin bn_2 == 0 -----
+	BigNum zero("0");
+	if (bn_2 == zero)
+	{
+		ans.is_neg = false;
+		ans.len = -1;
+		ans.val = "NAN";
+		cout << "erroe s.e./0\n";
+		
+		return ans;
+	}
+	// ----- end bn_2 == 0 -----
+	
 	if (bn_1 < bn_2)
 	{
 		ans.set_val("0");
@@ -270,10 +285,24 @@ BigNum operator/(BigNum &bn_1, BigNum &bn_2)
 	BigNum bn_rt = bn_2;
 	int sf_len = bn_lf.len - bn_rt.len;
 
-	for (int i = sf_len; i >= 0; i--)
+	bn_rt = bn_rt.sf_lf(sf_len);
+	ans = ans.sf_lf(sf_len+1);
+	while (bn_lf >= bn_2)
 	{
-
+		while (bn_lf < bn_rt)
+		{
+			bn_rt = bn_rt.sf_rt(1);
+			sf_len--;
+		}
+		while (bn_lf >= bn_rt)
+		{
+			bn_lf = bn_lf - bn_rt;
+			ans.val[sf_len] = ans.val[sf_len] + 1;
+		}
 	}
+	ans.len = (int)ans.val.length();
+	ans.era_zero(false);
+	return ans;
 	// ----- end bn_1 > bn_2 -----
 }
 
@@ -304,7 +333,7 @@ BigNum BigNum::sf_rt(int sf_len)
 		}
 	}
 	ans.len = (int)ans.val.length();
-	return *this;
+	return ans;
 }
 
 BigNum BigNum::mul_int(int tmp_int)
@@ -336,7 +365,7 @@ BigNum BigNum::mul_int(int tmp_int)
 }
 // ----- end "sf_lf, sf_rt" -----
 
-// ----- begin "==, >, <" -----
+// ----- begin "==, >, <, >=, <=" -----
 bool operator==(const BigNum &bn_1, const BigNum &bn_2)
 {
 	if (bn_1.is_neg != bn_2.is_neg)	return false;
@@ -401,7 +430,23 @@ bool operator<(const BigNum &bn_1, const BigNum &bn_2)
 	if (bn_1 > bn_2) return false;
 	return true;
 }
-// ----- end "==, >, <" -----
+
+bool operator>=(const BigNum &bn_1, const BigNum &bn_2)
+{
+	if (bn_1 > bn_2 || bn_1 == bn_2)
+		return true;
+	else
+		return false;
+}
+
+bool operator<=(const BigNum &bn_1, const BigNum &bn_2)
+{
+	if (bn_1 < bn_2 || bn_1 == bn_2)
+		return true;
+	else
+		return false;
+}
+// ----- end "==, >, <, >=, <=" -----
 
 // ----- begin "negate" -----
 BigNum BigNum::negate()
