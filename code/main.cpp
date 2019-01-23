@@ -5,9 +5,9 @@
 
 int main()
 {
-	random_device rd;
-	default_random_engine gen = default_random_engine(rd());
-	uniform_int_distribution<int> dis(0, 2147483647);
+	//random_device rd;
+	//default_random_engine gen = default_random_engine(rd());
+	//uniform_int_distribution<int> dis(0, 2147483647);
 
 	BigNum a, b;
 	BigNum ans_bn, tmp;
@@ -42,10 +42,10 @@ int main()
 	
 	for(int i=0; i < 200000; i++)
 	{
-		x = dis(gen);
-		y = (rand())^3 + 1;
-		//if (rand() % 2)	x = -x;
-		//if (rand() % 2)	y = -y;
+		x = rand() * rand();
+		y = rand() + 1;
+		if (rand() % 2)	x = -x;
+		if (rand() % 2)	y = -y;
 		a.set_val(to_string(x));
 		b.set_val(to_string(y));
 

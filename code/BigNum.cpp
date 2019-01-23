@@ -250,7 +250,14 @@ BigNum operator*(BigNum &bn_1, BigNum &bn_2)
 }
 // ----- end "=, +, -, *" -----
 
-// ----- begin "sf_lf, sf_rt" -----
+// ----- begin "/, sf_lf, sf_rt, mul_int" -----
+/*
+	+p/+k : p = q * k + r.
+	-p/+k : (-p) =  (-q) * k + (-r) 
+	+p/-k : p =  (-q) * (-k) + r
+	-p/-k : (-p) =  q * (-k) + (-r)
+	http://highscope.ch.ntu.edu.tw/wordpress/?p=12324
+*/
 BigNum operator/(BigNum &bn_1, BigNum &bn_2)
 {
 	BigNum ans;
@@ -268,26 +275,40 @@ BigNum operator/(BigNum &bn_1, BigNum &bn_2)
 	}
 	// ----- end bn_2 == 0 -----
 	
-	if (bn_1 < bn_2)
+	/*
+		step 1 : compute +p/+k
+		step 2 : consider the sign of p and k
+	*/
+	// ----- begin +p/+k -----
+	BigNum bn_lf = bn_1;
+	BigNum bn_rt = bn_2;
+	bn_lf.is_neg = false;
+	bn_rt.is_neg = false;
+
+	if (bn_lf < bn_rt)
 	{
 		ans.set_val("0");
 		return ans;
 	}
 
-	if (bn_1 == bn_2)
+	if (bn_lf == bn_rt)
 	{
 		ans.set_val("1");
+		// consider the sign
+		if (bn_1.is_neg ^ bn_2.is_neg)
+			ans.is_neg = true;
 		return ans;
 	}
 
-	// ----- begin bn_1 > bn_2 -----
-	BigNum bn_lf = bn_1;
-	BigNum bn_rt = bn_2;
+	// bn_lf > bn_rt
+	// TODO : not use tmp_bn_2, but change bn_2.is_neg, and recover it at the end.
+	BigNum tmp_bn_2 = bn_2;
+	tmp_bn_2.is_neg = false;
 	int sf_len = bn_lf.len - bn_rt.len;
 
 	bn_rt = bn_rt.sf_lf(sf_len);
 	ans = ans.sf_lf(sf_len+1);
-	while (bn_lf >= bn_2)
+	while (bn_lf >= tmp_bn_2)
 	{
 		while (bn_lf < bn_rt)
 		{
@@ -302,8 +323,80 @@ BigNum operator/(BigNum &bn_1, BigNum &bn_2)
 	}
 	ans.len = (int)ans.val.length();
 	ans.era_zero(false);
+	// consider the sign
+	if (bn_1.is_neg ^ bn_2.is_neg)
+		ans.is_neg = true;
 	return ans;
-	// ----- end bn_1 > bn_2 -----
+	// ----- end +p/+k -----
+}
+
+BigNum operator%(BigNum &bn_1, BigNum &bn_2)
+{
+	BigNum ans;
+
+	// ----- begin bn_2 == 0 -----
+	BigNum zero("0");
+	if (bn_2 == zero)
+	{
+		ans.is_neg = false;
+		ans.len = -1;
+		ans.val = "NAN";
+		cout << "erroe s.e./0\n";
+
+		return ans;
+	}
+	// ----- end bn_2 == 0 -----
+
+	/*
+		step 1 : compute +p/+k
+		step 2 : consider the sign of p and k
+	*/
+	// ----- begin +p/+k -----
+	BigNum bn_lf = bn_1;
+	BigNum bn_rt = bn_2;
+	bn_lf.is_neg = false;
+	bn_rt.is_neg = false;
+
+	if (bn_lf < bn_rt)
+	{
+		ans = bn_lf;
+		if (bn_1.is_neg)
+			ans.is_neg = true;
+		return ans;
+	}
+
+	if (bn_lf == bn_rt)
+	{
+		ans.set_val("0");
+		return ans;
+	}
+
+	// bn_lf > bn_rt
+	// TODO : not use tmp_bn_2, but change bn_2.is_neg, and recover it at the end.
+	BigNum tmp_bn_2 = bn_2;
+	tmp_bn_2.is_neg = false;
+	int sf_len = bn_lf.len - bn_rt.len;
+
+	bn_rt = bn_rt.sf_lf(sf_len);
+	while (bn_lf >= tmp_bn_2)
+	{
+		while (bn_lf < bn_rt)
+		{
+			bn_rt = bn_rt.sf_rt(1);
+		}
+		while (bn_lf >= bn_rt)
+		{
+			bn_lf = bn_lf - bn_rt;
+		}
+	}
+	ans = bn_lf;
+	ans.len = (int)ans.val.length();
+	ans.era_zero(false);
+	// consider the sign
+	if (bn_1.is_neg)
+		ans.is_neg = true;
+	return ans;
+	// ----- end +p/+k -----
 }
 
 BigNum BigNum::sf_lf(int sf_len)
@@ -363,7 +456,7 @@ BigNum BigNum::mul_int(int tmp_int)
 	ans.len = (int)ans.val.length();
 	return ans;
 }
-// ----- end "sf_lf, sf_rt" -----
+// ----- end "/, sf_lf, sf_rt, mul_int" -----
 
 // ----- begin "==, >, <, >=, <=" -----
 bool operator==(const BigNum &bn_1, const BigNum &bn_2)
